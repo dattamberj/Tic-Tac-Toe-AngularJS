@@ -1,0 +1,136 @@
+<html>
+<head>
+<title>Tic Tac Toe</title>
+      <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<style>
+body{
+	background: url('http://cdn.pcwallart.com/images/polygons-in-nature-wallpaper-2.jpg') no-repeat center center fixed;
+	background-size: cover;
+	color : white;
+	};
+body,table,td,tr,h2{
+color: white;
+font-family: Trebuchet MS, Helvetica, sans-serif;
+}
+table {
+	
+	}
+td {
+	border: 5px groove navy;
+	width: 90px; 
+	height: 90px;
+	font-size: 50px;
+	font-weight: bolder;
+	text-align: center;
+	}
+table.fixed { table-layout:fixed; }
+table.fixed td { overflow: hidden; }
+</style>
+<body ng-app="tictac">
+<div ng-controller="ctrl">
+<center>
+<h2><br>--- Tic Tac Toe ---</h2><br><br>
+<table class="fixed" ng-model="tab">
+<tr ng-repeat="row in pos">
+<td ng-click="clicked($index,'val1')">{{row.val1.val}}</td>
+<td ng-click="clicked($index,'val2')">{{row.val2.val}}</td>
+<td ng-click="clicked($index,'val3')">{{row.val3.val}}</td>
+</tr>
+</table>
+<br>
+<div style="font-size: 25px;" ng-show="winner"><b>{{winner}}</b></div>
+</center>
+</div>
+</body>
+<script>
+
+var app = angular.module('tictac', []);
+app.controller('ctrl', function($scope,$timeout) {
+    $scope.pos = [{"val1": {"val":"","w":4},"val2":{"val":"","w":9},"val3":{"val":"","w":2}},{"val1":{"val":"","w":3},"val2":{"val":"","w":5},"val3":{"val":"","w":7}},{"val1":{"val":"","w":8},"val2":{"val":"","w":1},"val3":{"val":"","w":6}}];
+	$scope.stat = true;
+	$scope.winner = "";
+	$scope.count = 0;
+	$scope.p1 = 0;
+	$scope.p2 = 0;
+	$scope.p1a = [0];
+	$scope.p2a = [0];
+	$scope.clicked = function($index,pt) {
+		$scope.row = $index;
+		$scope.col = pt;
+		$scope.count += 1;
+		if($scope.stat) 
+		{
+			$scope.pos[$index][pt]["val"]='X';
+			$scope.p1 += $scope.pos[$index][pt]["w"];
+			$scope.p1a.push($scope.pos[$index][pt]["w"]);
+			arr = $scope.getSummingItems($scope.p1a,15);
+			arr = $scope.check(arr);
+			if(arr) 
+			{
+			$scope.winner = "Player 1 wins ... Game will restart in 3 seconds";
+			$timeout(function () {
+				$scope.reset();
+				}, 2000);
+			}
+		}
+		else
+		{
+			$scope.pos[$index][pt]["val"]='O';
+			$scope.p2 += $scope.pos[$index][pt]["w"];
+			$scope.p2a.push($scope.pos[$index][pt]["w"]);
+			arr = $scope.getSummingItems($scope.p2a,15);
+			arr = $scope.check(arr);
+			if(arr) 
+			{
+			$scope.winner = "Player 2 wins ... Game will restart in 3 seconds";
+			$timeout(function () {
+				$scope.reset();
+				}, 3000);
+			}
+		}
+		if($scope.count == 9)
+			{
+			$scope.winner = "Draw ... Game will restart in 3 seconds";
+			$timeout(function () {
+				$scope.reset();
+				}, 3000);
+			}
+		$scope.stat = !$scope.stat;
+	};
+	$scope.reset = function(){	
+			$scope.pos = [{"val1": {"val":"","w":4},"val2":{"val":"","w":9},"val3":{"val":"","w":2}},{"val1":{"val":"","w":3},"val2":{"val":"","w":5},"val3":{"val":"","w":7}},{"val1":{"val":"","w":8},"val2":{"val":"","w":1},"val3":{"val":"","w":6}}];
+			$scope.stat = true;
+			$scope.winner = "";
+			$scope.count = 0;
+			$scope.p1 = 0;
+			$scope.p2 = 0;
+			$scope.p1a = [0];
+			$scope.p2a = [0];
+		};
+	$scope.getSummingItems = function(a,t){
+			return a.reduce((h,n) => Object.keys(h)
+                      .reduceRight((m,k) => +k+n <= t ? (m[+k+n] = m[+k+n] ? m[+k+n].concat(m[k].map(sa => sa.concat(n)))
+                                                    : m[k].map(sa => sa.concat(n)),m)
+                                                                 :  m, h), {[[]]:[[]]})[t];
+		};
+	$scope.check = function(ar){
+			f=0;
+			for(var j in ar)
+				{
+				for(i in ar[j])
+					{
+					console.log("array ele " + ar[j][i]);
+					if(ar[j][i] == 0)
+						f=1;
+					}
+				if(!f && ar[j].length == 3 )
+					return true;
+				console.log("leng"+ar[j].length+" flag "+f);
+				}
+		};
+	
+});
+</script>
+</html>
