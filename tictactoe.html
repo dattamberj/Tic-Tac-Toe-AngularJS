@@ -34,9 +34,9 @@ table.fixed td { overflow: hidden; }
 <h2><br>--- Tic Tac Toe ---</h2><br><br>
 <table class="fixed" ng-model="tab">
 <tr ng-repeat="row in pos">
-<td ng-click="clicked($index,'val1')">{{row.val1.val}}</td>
-<td ng-click="clicked($index,'val2')">{{row.val2.val}}</td>
-<td ng-click="clicked($index,'val3')">{{row.val3.val}}</td>
+<td ng-click="clicked($index,'val1')" >{{row.val1.val}}</td>
+<td ng-click="clicked($index,'val2')" >{{row.val2.val}}</td>
+<td ng-click="clicked($index,'val3')" >{{row.val3.val}}</td>
 </tr>
 </table>
 <br>
@@ -49,6 +49,7 @@ table.fixed td { overflow: hidden; }
 var app = angular.module('tictac', []);
 app.controller('ctrl', function($scope,$timeout) {
     $scope.pos = [{"val1": {"val":"","w":4},"val2":{"val":"","w":9},"val3":{"val":"","w":2}},{"val1":{"val":"","w":3},"val2":{"val":"","w":5},"val3":{"val":"","w":7}},{"val1":{"val":"","w":8},"val2":{"val":"","w":1},"val3":{"val":"","w":6}}];
+	$scope.isDisabled = false;
 	$scope.stat = true;
 	$scope.winner = "";
 	$scope.count = 0;
@@ -59,9 +60,10 @@ app.controller('ctrl', function($scope,$timeout) {
 	$scope.clicked = function($index,pt) {
 		$scope.row = $index;
 		$scope.col = pt;
-		$scope.count += 1;
-		if($scope.stat) 
+		if($scope.stat && $scope.pos[$index][pt]["val"]=="") 
 		{
+			$scope.stat = !$scope.stat;
+			$scope.count += 1;
 			$scope.pos[$index][pt]["val"]='X';
 			$scope.p1 += $scope.pos[$index][pt]["w"];
 			$scope.p1a.push($scope.pos[$index][pt]["w"]);
@@ -72,11 +74,20 @@ app.controller('ctrl', function($scope,$timeout) {
 			$scope.winner = "Player 1 wins ... Game will restart in 3 seconds";
 			$timeout(function () {
 				$scope.reset();
-				}, 2000);
+				}, 3000);
+			}
+			else if($scope.count==9)
+			{
+				$scope.winner = "Draw ... Game will restart in 3 seconds";
+				$timeout(function () {
+				$scope.reset();
+				}, 3000);
 			}
 		}
-		else
+		else if(!$scope.stat && $scope.pos[$index][pt]["val"]=="")
 		{
+			$scope.stat = !$scope.stat;
+			$scope.count += 1;
 			$scope.pos[$index][pt]["val"]='O';
 			$scope.p2 += $scope.pos[$index][pt]["w"];
 			$scope.p2a.push($scope.pos[$index][pt]["w"]);
@@ -89,15 +100,14 @@ app.controller('ctrl', function($scope,$timeout) {
 				$scope.reset();
 				}, 3000);
 			}
-		}
-		if($scope.count == 9)
+			else if($scope.count==9)
 			{
-			$scope.winner = "Draw ... Game will restart in 3 seconds";
-			$timeout(function () {
+				$scope.winner = "Draw ... Game will restart in 3 seconds";
+				$timeout(function () {
 				$scope.reset();
 				}, 3000);
 			}
-		$scope.stat = !$scope.stat;
+		}
 	};
 	$scope.reset = function(){	
 			$scope.pos = [{"val1": {"val":"","w":4},"val2":{"val":"","w":9},"val3":{"val":"","w":2}},{"val1":{"val":"","w":3},"val2":{"val":"","w":5},"val3":{"val":"","w":7}},{"val1":{"val":"","w":8},"val2":{"val":"","w":1},"val3":{"val":"","w":6}}];
@@ -117,17 +127,24 @@ app.controller('ctrl', function($scope,$timeout) {
 		};
 	$scope.check = function(ar){
 			f=0;
+			k=false;
 			for(var j in ar)
 				{
+					f=0;
 				for(i in ar[j])
 					{
-					console.log("array ele " + ar[j][i]);
+					//console.log("array ele " + ar[j][i]);
 					if(ar[j][i] == 0)
 						f=1;
 					}
+					//console.log("next subr");
+				//console.log("leng"+ar[j].length+" flag "+f+" truth "+k);
 				if(!f && ar[j].length == 3 )
-					return true;
-				console.log("leng"+ar[j].length+" flag "+f);
+					{
+					k=true;
+					return k;
+					}
+				
 				}
 		};
 	
